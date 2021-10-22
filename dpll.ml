@@ -6,7 +6,8 @@ open List
    pour chaque élément de `list', appliquer `filter' :
    - si le résultat est `Some e', ajouter `e' au résultat ;
    - si le résultat est `None', ne rien ajouter au résultat.
-   Attention, cette implémentation inverse l'ordre de la liste *)
+   Attention, cette implémentation inverse l'ordre de la liste 
+   couou*)
 let filter_map filter list =
   let rec aux list ret =
     match list with
