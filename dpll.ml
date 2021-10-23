@@ -108,8 +108,14 @@ let rec solveur_dpll_rec clauses interpretation =
   if mem [] clauses then None else
   try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with 
     | Failure "Pas de littéral pure" -> 
-    try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
-    | Not_found ->
+      try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
+        | Not_found ->
+          let l = hd (hd clauses) in
+          let branche = solveur_dpll_rec (simplifie l clauses) (l::interpretation) in
+          match branche with
+            | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
+            | _    -> branche
+
       
 
   
