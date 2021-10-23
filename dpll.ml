@@ -79,9 +79,14 @@ let () = print_modele (solveur_split systeme [])
       le littéral de cette clause unitaire ;
     - sinon, lève une exception `Not_found' *)
 
-let rec unitaire clauses = match clauses with
-  | [] -> raise Not_found
-  | hd::tl -> if List.length hd = 1 then List.nth 1 0 else unitaire tl
+let unitaire clauses = 
+  let rec check l = match l with 
+    | hd::tl -> 
+        if List.length hd = 1 then List.hd hd
+        else check tl
+    | _ -> raise Not_found
+  in check clauses
+;;
 
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
