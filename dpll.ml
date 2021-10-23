@@ -66,11 +66,10 @@ let rec solveur_split clauses interpretation =
   | None -> solveur_split (simplifie (-l) clauses) ((-l)::interpretation)
   | _    -> branche
 
-(* tests *)
-let () = print_modele (solveur_split exemple_3_12 [])
-let () = print_modele (solveur_split systeme []) 
-
-(* let () = print_modele (solveur_split coloriage []) *)
+(* tests 
+let () = print_modele (solveur_split exemple_7_2 [])
+let () = print_modele (solveur_split coloriage []) 
+*)
 
 (* solveur dpll récursif *)
     
@@ -94,20 +93,31 @@ let unitaire clauses =
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
 let pur clauses =
   let rec check l acc = match l with 
+    | [] -> raise (Failure "Pas de littéral pure")
     | hd::tl -> 
         if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
         else check tl (hd::acc)
-    | _ -> failwith "pas de littéral pur"
   in check (List.flatten (clauses)) []
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
+(* Idée: On simplifie en priorité par les littéraux unitaire ou pur, on ne simplifie pas par leur dual l barre *)
 let rec solveur_dpll_rec clauses interpretation =
-  (* à compléter *)
-  None
+  (* l'ensemble vide de clauses est satisfiable *)
+  if clauses = [] then Some interpretation else
+  (* un clause vide est insatisfiable *)
+  if mem [] clauses then None else
+  try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with 
+    | Failure "Pas de littéral pure" -> 
+    try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
+    | Not_found ->
+      
+
+  
 
 (* tests *)
 (* let () = print_modele (solveur_dpll_rec systeme []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
+
 
 let () =
   let clauses = Dimacs.parse Sys.argv.(1) in
