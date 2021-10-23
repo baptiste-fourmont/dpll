@@ -6,7 +6,8 @@ open List
    pour chaque élément de `list', appliquer `filter' :
    - si le résultat est `Some e', ajouter `e' au résultat ;
    - si le résultat est `None', ne rien ajouter au résultat.
-   Attention, cette implémentation inverse l'ordre de la liste *)
+   Attention, cette implémentation inverse l'ordre de la liste 
+   couou*)
 let filter_map filter list =
   let rec aux list ret =
     match list with
@@ -38,9 +39,16 @@ let coloriage = [[1;2;3];[4;5;6];[7;8;9];[10;11;12];[13;14;15];[16;17;18];[19;20
 (* simplifie : int -> int list list -> int list list 
    applique la simplification de l'ensemble des clauses en mettant
    le littéral i à vrai *)
+(* 
+  Si clause contient i supprime la clause
+  Si clause contient -i alors supprime les -i
+*)
 let simplifie i clauses =
-  (* à compléter *)
-  []
+  let filter l = 
+    if List.mem i l then None
+    else 
+      Some(let check x = if x = (-i) then None else Some(x) in (filter_map check l)) 
+      in filter_map filter (clauses)
 
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -59,7 +67,9 @@ let rec solveur_split clauses interpretation =
   | _    -> branche
 
 (* tests *)
-(* let () = print_modele (solveur_split systeme []) *)
+let () = print_modele (solveur_split exemple_3_12 [])
+let () = print_modele (solveur_split systeme []) 
+
 (* let () = print_modele (solveur_split coloriage []) *)
 
 (* solveur dpll récursif *)
@@ -68,10 +78,12 @@ let rec solveur_split clauses interpretation =
     - si `clauses' contient au moins une clause unitaire, retourne
       le littéral de cette clause unitaire ;
     - sinon, lève une exception `Not_found' *)
-let unitaire clauses =
+
+let rec unitaire clauses = match clauses with
+  | [] -> raise Not_found
+  | hd::tl -> if List.length hd = 1 then List.nth 1 0 else unitaire tl
   (* à compléter *)
-  0
-    
+
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
