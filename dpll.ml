@@ -96,7 +96,7 @@ let pur clauses =
     | hd::tl -> 
         if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
         else check tl (hd::acc)
-    | _ -> raise (Failure "Pas de littéral pure")
+    | _ -> raise (Failure "Pas de littéral pur")
   in check (List.flatten (clauses)) []
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
