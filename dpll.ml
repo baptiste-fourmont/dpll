@@ -106,8 +106,8 @@ let rec solveur_dpll_rec clauses interpretation =
   if clauses = [] then Some interpretation else
   (* un clause vide est insatisfiable *)
   if mem [] clauses then None else
-  try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with 
-    | Failure "Pas de littéral pure" -> 
+  try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with
+    | (Failure _) -> 
       try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
         | Not_found ->
           let l = List.hd (List.hd clauses) in
@@ -115,16 +115,9 @@ let rec solveur_dpll_rec clauses interpretation =
           match branche with
             | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
             | _    -> branche
-
-      
-
-  
-
 (* tests *)
 (* let () = print_modele (solveur_dpll_rec systeme []) *)
 (* let () = print_modele (solveur_dpll_rec coloriage []) *)
-
-
 let () =
   let clauses = Dimacs.parse Sys.argv.(1) in
   print_modele (solveur_dpll_rec clauses [])
