@@ -93,10 +93,10 @@ let unitaire clauses =
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
 let pur clauses =
   let rec check l acc = match l with 
-    | [] -> raise (Failure "Pas de littéral pure")
     | hd::tl -> 
         if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
         else check tl (hd::acc)
+    | _ -> raise (Failure "Pas de littéral pure")
   in check (List.flatten (clauses)) []
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
