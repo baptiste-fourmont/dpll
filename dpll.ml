@@ -110,7 +110,7 @@ let rec solveur_dpll_rec clauses interpretation =
     | Failure "Pas de littéral pure" -> 
       try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
         | Not_found ->
-          let l = hd (hd clauses) in
+          let l = List.hd (List.hd clauses) in
           let branche = solveur_dpll_rec (simplifie l clauses) (l::interpretation) in
           match branche with
             | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
