@@ -82,15 +82,18 @@ let () = print_modele (solveur_split systeme [])
 let rec unitaire clauses = match clauses with
   | [] -> raise Not_found
   | hd::tl -> if List.length hd = 1 then List.nth 1 0 else unitaire tl
-  (* à compléter *)
 
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
 let pur clauses =
-  (* à compléter *)
-  0
+  let rec check l acc = match l with 
+    | hd::tl -> 
+        if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
+        else check tl (hd::acc)
+    | _ -> failwith "pas de littéral pur"
+  in check (List.flatten (clauses)) []
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
 let rec solveur_dpll_rec clauses interpretation =
