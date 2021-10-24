@@ -66,10 +66,7 @@ let rec solveur_split clauses interpretation =
   | None -> solveur_split (simplifie (-l) clauses) ((-l)::interpretation)
   | _    -> branche
 
-(* tests 
-let () = print_modele (solveur_split exemple_7_2 [])
-let () = print_modele (solveur_split coloriage []) 
-*)
+(* let () = print_modele (solveur_split exemple_7_2 []) *)
 
 (* solveur dpll récursif *)
     
@@ -116,8 +113,9 @@ let rec solveur_dpll_rec clauses interpretation =
             | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
             | _    -> branche
 (* tests *)
-(* let () = print_modele (solveur_dpll_rec systeme []) *)
-(* let () = print_modele (solveur_dpll_rec coloriage []) *)
+
+(* let () = print_modele (solveur_dpll_rec exemple_7_2 []) *)
+
 let () =
   let clauses = Dimacs.parse Sys.argv.(1) in
   print_modele (solveur_dpll_rec clauses [])
