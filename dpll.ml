@@ -47,7 +47,7 @@ let simplifie i clauses =
   let filter l = 
     if List.mem i l then None
     else 
-      Some(let check x = if x = (-i) then None else Some(x) in (filter_map check l)) 
+      Some(let check x = if x <> (-i) then Some(x) else None in (filter_map check l)) 
   in filter_map filter (clauses)
 
 (* solveur_split : int list list -> int list -> int list option
