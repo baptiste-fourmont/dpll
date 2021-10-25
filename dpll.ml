@@ -76,14 +76,13 @@ let rec solveur_split clauses interpretation =
     - sinon, lève une exception `Not_found' *)
 
 let unitaire clauses = 
-  let rec check l = match l with 
+  let rec check l acc = match l with 
     | hd::tl -> 
-        if List.length hd = 1 then List.hd hd
-        else check tl
+        if List.length hd = 1 && List.length acc = 0 then List.hd hd
+        else check tl acc
     | _ -> raise Not_found
-  in check clauses
-;;
-
+  in check clauses []
+  
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
