@@ -44,11 +44,11 @@ let coloriage = [[1;2;3];[4;5;6];[7;8;9];[10;11;12];[13;14;15];[16;17;18];[19;20
   Si clause contient -i alors supprime les -i
 *)
 let simplifie i clauses =
-  let filter l = 
-    if List.mem i l then None
-    else 
-      Some(let check x = if x <> (-i) then Some(x) else None in (filter_map check l)) 
-  in filter_map filter (clauses)
+  filter_map (fun clause -> 
+      if List.mem i clause then None
+      else if clause = [] then None
+      else Some(filter_map (fun x -> if x = -i then None else Some(x)) clause)
+    ) clauses
 
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -87,13 +87,15 @@ let unitaire clauses =
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
+
 let pur clauses =
   let rec check l acc = match l with 
     | hd::tl -> 
         if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
         else check tl (hd::acc)
     | _ -> raise (Failure "Pas de littéral pur")
-  in check (List.flatten (clauses)) []
+  in 
+  check (List.flatten (clauses)) ([])
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
 (* Idée: On simplifie en priorité par les littéraux unitaire ou pur, on ne simplifie pas par leur dual l barre *)
@@ -102,15 +104,15 @@ let rec solveur_dpll_rec clauses interpretation =
   if clauses = [] then Some interpretation else
   (* un clause vide est insatisfiable *)
   if mem [] clauses then None else
-  try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with
-    | (Failure _) -> 
-      try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
-        | Not_found ->
-          let l = List.hd (List.hd clauses) in
-          let branche = solveur_dpll_rec (simplifie l clauses) (l::interpretation) in
-          match branche with
-            | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
-            | _    -> branche
+  try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
+    | Not_found ->
+        try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with
+          | (Failure _) -> 
+              let l = List.hd (List.hd clauses) in
+              let branche = solveur_dpll_rec (simplifie l clauses) (l::interpretation) in
+              match branche with
+                | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
+                | _    -> branche
 (* tests *)
 
 (* let () = print_modele (solveur_dpll_rec exemple_7_2 []) *)
