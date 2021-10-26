@@ -43,12 +43,12 @@ let coloriage = [[1;2;3];[4;5;6];[7;8;9];[10;11;12];[13;14;15];[16;17;18];[19;20
   Si clause contient i supprime la clause
   Si clause contient -i alors supprime les -i
 *)
-let simplifie i clauses =
-  filter_map (fun clause -> 
-      if List.mem i clause then None
-      else if clause = [] then None
-      else Some(filter_map (fun x -> if x = -i then None else Some(x)) clause)
-    ) clauses
+ let simplifie i clauses =
+  let filter l = 
+    if List.mem i l then None
+    else 
+      Some(let check x = if x <> (-i) then Some(x) else None in (filter_map check l)) 
+  in filter_map filter (clauses)
 
 (* solveur_split : int list list -> int list -> int list option
    exemple d'utilisation de `simplifie' *)
@@ -77,25 +77,23 @@ let rec solveur_split clauses interpretation =
 
 let unitaire clauses = 
   let rec check l = match l with 
+    | [] -> raise Not_found
     | hd::tl -> 
-        if List.length hd = 1 then List.hd hd
-        else check tl
-    | _ -> raise Not_found
+      if List.length hd = 1 then List.hd hd
+      else check tl
   in check clauses
 
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
       ce littéral ;
     - sinon, lève une exception `Failure "pas de littéral pur"' *)
-
 let pur clauses =
   let rec check l acc = match l with 
+    | [] -> raise (Failure "Pas de littéral pur")
     | hd::tl -> 
-        if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
-        else check tl (hd::acc)
-    | _ -> raise (Failure "Pas de littéral pur")
-  in 
-  check (List.flatten (clauses)) ([])
+      if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
+      else check tl (hd::acc)
+  in check (List.flatten(clauses)) [] 
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
 (* Idée: On simplifie en priorité par les littéraux unitaire ou pur, on ne simplifie pas par leur dual l barre *)
