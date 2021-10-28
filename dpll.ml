@@ -3,7 +3,7 @@ open List
 (* fonctions utilitaires *********************************************)
 (* filter_map : ('a -> 'b option) -> 'a list -> 'b list
    disponible depuis la version 4.08.0 de OCaml dans le module List :
-   pour chaque élément de `list', appliquer `filter' :
+   pour chaque élément de `list', appliquer `filter' :cc
    - si le résultat est `Some e', ajouter `e' au résultat ;
    - si le résultat est `None', ne rien ajouter au résultat.
    Attention, cette implémentation inverse l'ordre de la liste 
@@ -75,13 +75,13 @@ let rec solveur_split clauses interpretation =
       le littéral de cette clause unitaire ;
     - sinon, lève une exception `Not_found' *)
 
-let unitaire clauses = 
-  let rec check l = match l with 
-    | [] -> raise Not_found
-    | hd::tl -> 
-      if List.length hd = 1 then List.hd hd
-      else check tl
-  in check clauses
+  let unitaire clauses = 
+    let rec check l = match l with
+      | [] -> raise Not_found
+      | hd::tl -> match hd with
+        | [hd] -> hd
+        |  _ -> check tl
+    in check clauses
 
 (* pur : int list list -> int
     - si `clauses' contient au moins un littéral pur, retourne
@@ -93,6 +93,7 @@ let pur clauses =
     | hd::tl -> 
       if not(List.mem(hd) acc || List.mem (-hd) acc) && not(List.mem(-hd) tl) then hd 
       else check tl (hd::acc)
+  
   in check (List.flatten(clauses)) [] 
 
 (* solveur_dpll_rec : int list list -> int list -> int list option *)
@@ -105,10 +106,10 @@ let rec solveur_dpll_rec clauses interpretation =
   try let uni = unitaire(clauses) in solveur_dpll_rec (simplifie uni clauses)(uni::interpretation) with
     | Not_found ->
         try let pure = pur(clauses) in solveur_dpll_rec (simplifie pure clauses) (pure::interpretation) with
-          | (Failure _) -> 
+          | (Failure _ ) -> 
               let l = List.hd (List.hd clauses) in
               let branche = solveur_dpll_rec (simplifie l clauses) (l::interpretation) in
-              match branche with
+              match branche wiFailureth
                 | None -> solveur_dpll_rec (simplifie (-l) clauses) ((-l)::interpretation)
                 | _    -> branche
 (* tests *)
